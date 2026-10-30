@@ -1,50 +1,68 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+Version change: not established → 1.0.0 (initial constitution)
+Modified principles: None; this is the initial adoption.
+Added sections: Core Principles (7), Technology Baseline, Development Workflow.
+Removed sections: None.
+Follow-up TODOs: None.
+-->
+# library-lending Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Supported Stack
+The application MUST use Java 17 and Spring Boot, build through the Gradle wrapper, and use
+in-memory H2. Stack changes require an approved constitution amendment.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Layered Architecture
+Application requests MUST follow the controller → service → repository layers. Dependencies
+MUST respect this direction; controllers and services MUST NOT bypass the repository layer to
+access persistence directly.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Business Logic Boundaries
+Business rules MUST reside in services or the domain model. Controllers MUST be limited to
+HTTP handling, input binding and validation, delegation, and response mapping; they MUST NOT
+implement business logic.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Automated Test Strategy
+Tests MUST use JUnit 5. Services MUST have unit tests, controllers MUST be tested with
+`@WebMvcTest`, and repositories MUST be tested with `@DataJpaTest`. A task is complete only
+when `./gradlew test` passes.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Deterministic Money and Time
+Monetary values MUST use `BigDecimal`. Date-dependent behavior MUST use an injected
+`java.time.Clock`; code MUST NOT call `LocalDate.now()` without that clock.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+### VI. HTTP API Contract
+The API MUST use JSON, return appropriate HTTP status codes, and represent errors consistently
+with Spring `ProblemDetail`. Request input MUST be validated with Bean Validation.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### VII. Focused Changes and Naming
+Changes MUST be small and limited to the task's scope. Class and method names MUST be in
+English. New dependencies require explicit approval.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## Technology Baseline
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+The Java 17, Spring Boot, Gradle wrapper, and in-memory H2 stack is the project baseline.
+Build and test commands MUST use the checked-in Gradle wrapper so they run with the project's
+declared Gradle version.
+
+## Development Workflow
+
+One task MUST produce one commit. A task MUST NOT modify code outside its scope. Before a task
+is considered complete, its applicable test suite MUST pass, including the full
+`./gradlew test` quality gate.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution takes precedence over conflicting project practices. Amendments MUST be made
+as documented changes to this file and reviewed and approved before they take effect. Every
+implementation change MUST be checked against these principles during planning and review;
+non-compliant changes MUST be revised or explicitly approved through a constitution amendment.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+Constitution versions follow semantic versioning: MAJOR for backward-incompatible governance
+changes or principle removals/redefinitions, MINOR for new principles or materially expanded
+requirements, and PATCH for clarifications and non-semantic wording changes. The version and
+amendment date MUST be updated with each approved amendment.
+
+**Version**: 1.0.0 | **Ratified**: 2026-10-30 | **Last Amended**: 2026-10-30
