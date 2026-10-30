@@ -8,6 +8,14 @@
 
 **Input**: User description: "Books and members management for the library. The library needs a catalog of books and a register of members before loans can exist in later features. Books have a title, an author, a unique ISBN and a number of copies (zero or more). Members have a name, a unique email and a registration date set by the system when the member is created. Registering a book or member returns the created record with its identifier. Duplicate ISBNs or emails are rejected with a field-specific error. Missing required fields, blank titles or names, invalid email formats and negative copy counts are rejected with a clear error for each invalid field. Books and members can be retrieved by identifier or listed. Loans, fines, reservations, updates, deletion, search, filters, pagination, and authentication are out of scope."
 
+## Clarifications
+
+### Session 2026-10-30
+
+- Q: Should the system treat ISBNs with different spacing or hyphenation as the same ISBN? → A: Ignore spaces and hyphens when comparing ISBNs; preserve the submitted ISBN for display.
+- Q: Should a book be rejected when its author or ISBN contains only whitespace? → A: Reject whitespace-only author and ISBN values.
+- Q: Should member emails that differ only by letter casing be treated as duplicates? → A: Ignore letter casing when checking email uniqueness.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Manage the book catalog (Priority: P1)
@@ -98,8 +106,13 @@ verify that every invalid field is identified in the rejection.
 
 - A copy count of zero is valid; any negative copy count is invalid.
 - A value containing only whitespace is blank for the title and name fields.
+- A value containing only whitespace is also invalid for the author and ISBN fields.
 - A submitted ISBN or email that conflicts with an existing record is rejected without
   creating a second record.
+- ISBN uniqueness ignores spaces and hyphens in the submitted value; the submitted ISBN
+  remains unchanged when returned or listed.
+- Email uniqueness ignores letter casing; an email differing only by case conflicts with
+  the existing member.
 - A lookup for an identifier that does not exist returns a not-found error specific to the
   requested record type.
 - A failed registration does not create a partial book or member record.
@@ -114,10 +127,11 @@ verify that every invalid field is identified in the rejection.
 - **FR-002**: The system MUST assign each registered book an identifier and return the
   identifier and submitted book details after successful registration.
 - **FR-003**: The system MUST reject a book registration when its ISBN conflicts with an
-  existing book and identify ISBN as the conflicting field.
+  existing book after ignoring spaces and hyphens, and identify ISBN as the conflicting
+  field. The system MUST preserve the submitted ISBN value when displaying the book.
 - **FR-004**: The system MUST reject book registration when any required field is missing,
-  the title is blank, or the copy count is negative, identifying every invalid field in the
-  rejected registration.
+  the title, author, or ISBN is blank, or the copy count is negative, identifying every
+  invalid field in the rejected registration. A field containing only whitespace is blank.
 - **FR-005**: The system MUST allow a copy count of zero.
 - **FR-006**: The system MUST allow a staff member to retrieve a book by identifier and
   return a clear not-found error when no book matches.
@@ -129,7 +143,7 @@ verify that every invalid field is identified in the rejection.
   registration date, and return the identifier and member details after successful
   registration.
 - **FR-010**: The system MUST reject a member registration when its email conflicts with an
-  existing member and identify email as the conflicting field.
+  existing member regardless of letter casing, and identify email as the conflicting field.
 - **FR-011**: The system MUST reject member registration when any required field is missing,
   the name is blank, or the email format is invalid, identifying every invalid field in the
   rejected registration.
@@ -169,11 +183,12 @@ verify that every invalid field is identified in the rejection.
 
 - The staff member is authorized to perform all included catalog and member-register
   operations; authentication and permissions are outside this feature.
-- ISBN uniqueness applies to identical submitted ISBN values; ISBN syntax and alternate
-  formatting normalization are not defined by this feature.
+- ISBN comparison ignores spaces and hyphens, but ISBN syntax and validity checks are not
+  defined by this feature.
 - Email uniqueness applies without regard to letter casing; email validation checks that
   the submitted value has a valid email format.
 - A member's registration date is the calendar date on which the system creates the member;
   callers do not set that date.
 - Listing returns every registered record because pagination and filtering are out of scope.
-- Author is required and must not be missing; no additional author-format rules are imposed.
+- Author is required and must not be missing or blank; no additional author-format rules
+  are imposed. ISBN is also required and must not be blank.
