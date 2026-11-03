@@ -59,7 +59,11 @@ real design needs: Spring Data Repository for persistence, Strategy for varying 
 for lifecycle behavior, and a factory or static factory for validated creation. The plan MUST
 identify the pattern and its reason when one is introduced. Unnecessary interfaces or layers
 without a second implementation or clear need are prohibited; when in doubt, choose the
-simplest solution.
+simplest solution. Exception: every service MUST be exposed through an interface 
+(for example, BookService) with its implementation in a separate class (for example, BookServiceImpl).
+Controllers MUST depend on the service interface, never on the implementation class.
+This exception applies to services only; other interfaces still require a second implementation
+or another clearly stated need.
 
 ## Technology Baseline
 
