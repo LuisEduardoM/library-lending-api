@@ -93,6 +93,7 @@ specs/001-book-member-management/
 src/
 ├── main/
 │   ├── kotlin/mvp/library_lending_api/
+|   |   |── config/
 │   │   ├── common/exception/
 │   │   │   ├── ApiExceptionHandler.kt
 │   │   │   └── domain exceptions
